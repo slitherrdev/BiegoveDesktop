@@ -1,0 +1,152 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:Biegove"
+        xmlns:ctrl="clr-namespace:Biegove.controllers"
+        x:Class="Biegove.MainWindow"
+        x:DataType="local:MainWindow"
+        MinWidth="850"
+        MinHeight="480"
+        Width="850"
+        Height="480"
+        Icon="avares://Biegove/Assets/icon.png"
+        Background="#fafafa"
+        Title="Biegove">
+
+    <DockPanel Margin="30,24,30,20">
+
+        <Grid DockPanel.Dock="Top" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" FontWeight="Bold" FontSize="20" Foreground="#111">Wyniki</TextBlock>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                <Ellipse x:Name="statusDot" Width="7" Height="7" Fill="#ccc" VerticalAlignment="Center"/>
+                <TextBlock x:Name="statusText" Text="..." FontSize="11" Foreground="#999" VerticalAlignment="Center"/>
+            </StackPanel>
+        </Grid>
+
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,0" Spacing="8">
+            <ComboBox x:Name="runCombo"
+                      ItemsSource="{Binding Runs}"
+                      SelectedItem="{Binding SelectedRun, Mode=TwoWay}"
+                      FontSize="13" MinWidth="200" MaxWidth="320"
+                      VerticalAlignment="Center">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate x:DataType="ctrl:RunHolder">
+                        <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+
+            <TextBox x:Name="searchBox" Watermark="Szukaj (nr / nazwisko)"
+                     FontSize="12" Width="180"
+                     VerticalAlignment="Center"
+                     TextChanged="OnSearchChanged"/>
+
+            <Button x:Name="importCsvBtn" Content="Importuj CSV"
+                    FontSize="12" Padding="10,5"
+                    VerticalAlignment="Center"
+                    Background="#333" Foreground="White"
+                    CornerRadius="12"
+                    Click="OnImportCsv"/>
+
+            <Button x:Name="exportBtn" Content="Eksportuj"
+                    FontSize="12" Padding="10,5"
+                    VerticalAlignment="Center"
+                    Background="#333" Foreground="White"
+                    CornerRadius="12"
+                    Click="OnExportClick"/>
+
+            <Button x:Name="sortBtn" Content="Czas ↑"
+                    FontSize="12" Padding="10,5"
+                    VerticalAlignment="Center"
+                    Background="#ddd" Foreground="#222"
+                    CornerRadius="12"
+                    Click="OnSortClick"/>
+
+            <Button x:Name="disconnectBtn" Content="Rozłącz"
+                    FontSize="12" Padding="10,5"
+                    VerticalAlignment="Center"
+                    Background="#c33" Foreground="White"
+                    CornerRadius="12"
+                    IsVisible="False"
+                    Click="OnDisconnect"/>
+
+            <TextBlock x:Name="recordCount"
+                       FontSize="12" Foreground="#999"
+                       VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <DataGrid x:Name="MainDataGrid" Margin="0,16,0,0"
+                  ItemsSource="{Binding People}"
+                  AutoGenerateColumns="False"
+                  CanUserResizeColumns="True"
+                  CanUserReorderColumns="False"
+                  CanUserSortColumns="False"
+                  IsReadOnly="True"
+                  HeadersVisibility="Column"
+                  GridLinesVisibility="Horizontal"
+                  HorizontalGridLinesBrush="#eee"
+                  HorizontalScrollBarVisibility="Auto"
+                  Background="White"
+                  RowBackground="White"
+                  BorderThickness="0"
+                  ClipToBounds="True"
+                  RowHeight="36"
+                  FontSize="14">
+
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="L.p." Binding="{Binding Index}" Width="50" MinWidth="40" MaxWidth="80"/>
+                <DataGridTextColumn Header="Klasyfikacja" Binding="{Binding DisplayKlasyfikacja}" Width="100" MinWidth="60" MaxWidth="160"/>
+                <DataGridTextColumn Header="Nr" Binding="{Binding numer}" Width="60" MinWidth="40" MaxWidth="120"/>
+                <DataGridTemplateColumn Header="Zawodnik" Width="*" MinWidth="80">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="ctrl:PersonHolder">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="4" Margin="12,0,0,0"
+                                        ToolTip.Tip="{Binding NoteTooltip}">
+                                <TextBlock Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis"/>
+                                <Border Background="#e0e0e0" CornerRadius="4" Padding="4,1" IsVisible="{Binding HasNote}" VerticalAlignment="Center">
+                                    <TextBlock Text="notatka" FontSize="10" Foreground="#666"/>
+                                </Border>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Kategoria" Binding="{Binding DisplayKategoria}" Width="120" MinWidth="60" MaxWidth="200"/>
+                <DataGridTextColumn Header="Czas" Binding="{Binding TimeDisplay}" Width="100" MinWidth="60" MaxWidth="160"/>
+                <DataGridTextColumn Header="Godzina" Binding="{Binding ClockTime}" Width="100" MinWidth="60" MaxWidth="160"/>
+                <DataGridTextColumn Header="Bieg" Binding="{Binding RunName}" Width="140" MinWidth="60" MaxWidth="250"/>
+            </DataGrid.Columns>
+
+            <DataGrid.Styles>
+                <Style Selector="DataGridColumnHeader">
+                    <Setter Property="Background" Value="#f5f5f5"/>
+                    <Setter Property="Foreground" Value="#666"/>
+                    <Setter Property="FontSize" Value="12"/>
+                    <Setter Property="FontWeight" Value="SemiBold"/>
+                    <Setter Property="Padding" Value="12,8"/>
+                    <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                    <Setter Property="BorderBrush" Value="#ddd"/>
+                </Style>
+                <Style Selector="DataGridRow">
+                    <Setter Property="FontSize" Value="14"/>
+                    <Setter Property="Foreground" Value="#111"/>
+                </Style>
+                <Style Selector="DataGridRow:pointerover /template/ Rectangle#BackgroundRectangle">
+                    <Setter Property="Fill" Value="#f5f5f5"/>
+                </Style>
+                <Style Selector="DataGridRow:selected /template/ Rectangle#BackgroundRectangle">
+                    <Setter Property="Fill" Value="#f0f0f0"/>
+                </Style>
+                <Style Selector="DataGridCell">
+                    <Setter Property="Padding" Value="12,6"/>
+                </Style>
+                <Style Selector="DataGridCell TextBlock">
+                    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                </Style>
+            </DataGrid.Styles>
+        </DataGrid>
+
+    </DockPanel>
+</Window>
